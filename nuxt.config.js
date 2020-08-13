@@ -50,6 +50,7 @@ export default {
   buildModules: [
     '@nuxtjs/vuetify',
     '@nuxtjs/dotenv',
+    '@nuxtjs/moment'
   ],
   /*
   ** Nuxt.js modules
@@ -89,5 +90,13 @@ export default {
   ** See https://nuxtjs.org/api/configuration-build/
   */
   build: {
-  }
+  },
+  fontawesome: {
+    imports: [
+      {
+        set: '@fortawesome/free-solid-svg-icons',
+        icons: ['fas']
+      }
+    ]
+  },
 }
