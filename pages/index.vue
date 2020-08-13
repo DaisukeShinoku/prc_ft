@@ -1,15 +1,16 @@
 <template>
 <div>
-hello
+  {{ currentUser.name }}
 </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 export default {
   components: {
   },
-  created () {
-    console.log('API_KEY:', process.env.API_KEY)
+  computed: {
+    ...mapGetters(['currentUser'])
   }
 }
 </script>
