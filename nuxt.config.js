@@ -1,5 +1,5 @@
 import colors from 'vuetify/es5/util/colors'
-
+require('dotenv').config();
 export default {
   /*
   ** Nuxt rendering mode
@@ -48,6 +48,7 @@ export default {
   */
   buildModules: [
     '@nuxtjs/vuetify',
+    '@nuxtjs/dotenv',
   ],
   /*
   ** Nuxt.js modules
