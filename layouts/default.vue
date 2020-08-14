@@ -1,6 +1,6 @@
 <template>
   <v-app style="background-color: #F1F8E9">
-    <FlashSuccess />
+    <Flash />
     <Loading />
     <Header />
     <v-content>
@@ -16,14 +16,13 @@
 import Header from '~/components/organisms/header.vue'
 import Footer from '~/components/organisms/footer.vue'
 import Loading from '~/components/molecules/loading.vue'
-import FlashSuccess from '~/components/molecules/flash-success.vue'
-
+import Flash from '~/components/molecules/Flash.vue'
 export default {
   components: {
     Header,
     Footer,
     Loading,
-    FlashSuccess
+    Flash
   },
   data () {
     return {
@@ -33,4 +32,3 @@ export default {
 </script>
 
 <style scoped>
-</style>

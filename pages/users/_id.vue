@@ -62,9 +62,8 @@
 
 <script>
 import axios from '@/plugins/axios'
-import ErrorCard from '~/components/molecules/error-card.vue'
+import ErrorCard from '~/components/molecules/ErrorCard.vue'
 import Heatmap from '~/components/molecules/Heatmap.vue'
-
 export default {
   components: {
     ErrorCard,
@@ -98,12 +97,10 @@ export default {
 h2 {
   margin-top: 12px;
 }
-
 div.user-level {
   margin: 0;
   padding: 0;
 }
-
 div.user-level h2 {
   margin: 0;
 }
