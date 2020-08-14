@@ -1,32 +1,42 @@
 <template>
-  <v-row>
-    <v-card class="mx-auto mt-5 pa-5" width="500px">
-      <v-card-title>
-        <h1 class="display-1">ログイン</h1>
-      </v-card-title>
-      <v-card-text>
-        <v-form>
-          <v-text-field v-model="email" label="メールアドレス" data-vv-name="email" required></v-text-field>
-          <v-text-field
+  <ValidationObserver ef="obs" v-slot="{ passes }">
+    <v-row>
+      <v-card class="mx-auto mt-5 pa-5" width="500px">
+        <v-card-title>
+          <h1 class="display-1">ログイン</h1>
+        </v-card-title>
+        <v-card-text>
+          <v-form>
+            <VTextFieldWithValidation
+            v-model="email"
+            rules="max:255|required|email"
+            label="メールアドレス"
+            />
+            <VTextFieldWithValidation
             v-model="password"
+            rules="required|min:6"
             label="パスワード"
-            data-vv-name="password"
-            required
             :type="show1 ? 'text' : 'password'"
             :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
             @click:append="show1 = !show1"
-          ></v-text-field>
-          <v-btn class="mr-4 light-green lighten-3 mx-auto" @click="login">ログイン</v-btn>
-          <p v-if="error" class="errors">{{error}}</p>
-        </v-form>
-      </v-card-text>
-    </v-card>
-  </v-row>
+            vid="password"
+            />
+            <v-btn class="mr-4 light-green lighten-3 mx-auto" @click="passes(login)">ログイン</v-btn>
+            <p v-if="error" class="errors">{{error}}</p>
+          </v-form>
+        </v-card-text>
+      </v-card>
+    </v-row>
+  </ValidationObserver>
 </template>
 
 <script>
+import VTextFieldWithValidation from '~/components/molecules/inputs/VTextFieldWithValidation.vue'
 import firebase from '@/plugins/firebase'
 export default {
+  components: {
+    VTextFieldWithValidation
+  },
   data () {
     return {
       email: '',
@@ -67,6 +77,7 @@ export default {
     }
   }
 }
+
 </script>
 
 <style scoped>

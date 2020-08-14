@@ -13,9 +13,15 @@
     persistent
     max-width="600px"
     >
-      <AddTimeReport
-      @closeModal="closeModal"
+      <EditTimeReport
+      v-if="editInitialValue"
       :editInitialValue="editInitialValue"
+      @closeModal="closeModal"
+      @updateTimeReport="updateTimeReport"
+      />
+      <AddTimeReport
+      v-else
+      @closeModal="closeModal"
       />
     </v-dialog>
   </div>
@@ -23,16 +29,18 @@
 
 <script>
 import AddTimeReport from './AddTimeReport.vue'
+import EditTimeReport from './EditTimeReport.vue'
 export default {
   components: {
-    AddTimeReport
+    AddTimeReport,
+    EditTimeReport
   },
   props: {
     btnDisplay: {
       type: Boolean,
       default: true
     },
-    dialog: {
+    modalDisplay: {
       type: Boolean,
       default: false
     },
@@ -40,10 +48,23 @@ export default {
       type: Object
     }
   },
+  data () {
+    return {
+      dialog: this.modalDisplay
+    }
+  },
   methods: {
     closeModal () {
       this.dialog = false
       this.$emit('closeModal')
+    },
+    updateTimeReport (data) {
+      this.$emit('updateTimeReport', data)
+    }
+  },
+  watch: {
+    modalDisplay (newValue) {
+      this.dialog = newValue
     }
   }
 }

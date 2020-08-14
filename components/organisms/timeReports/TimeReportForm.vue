@@ -2,7 +2,14 @@
   <ValidationObserver ef="obs" v-slot="{ passes }">
     <v-card>
       <v-card-title>
-        <span class="headline">時間を記録する</span>
+        <span
+        class="headline"
+        v-if="editInitialValue"
+        >記録を編集する</span>
+        <span
+        class="headline"
+        v-else
+        >時間を記録する</span>
       </v-card-title>
       <v-form>
         <v-card-text>
@@ -41,22 +48,31 @@
           <v-btn
           color="blue darken-1"
           text
-          @click="passes(addTimeReport)"
+          @click="passes(record)"
+          id="save"
           >Save</v-btn>
         </v-card-actions>
       </v-form>
     </v-card>
+    <ExpReductionAlert
+    :displayModal="displayAlert"
+    @cancel="cancel"
+    @understanding="understanding"
+    />
   </ValidationObserver>
 </template>
 
 <script>
-import VAutoCompleteWithValidation from '../molecules/inputs/VAutocompleteWithValidation.vue'
-import VTextAreaWithValidation from '../molecules/inputs/VTextAreaWithValidation.vue'
-import axios from '@/plugins/axios'
+import { ValidationObserver } from 'vee-validate' // テスト用にインポート
+import VAutoCompleteWithValidation from '../../molecules/inputs/VAutocompleteWithValidation.vue'
+import VTextAreaWithValidation from '../../molecules/inputs/VTextAreaWithValidation.vue'
+import ExpReductionAlert from '../ExpReductionAlert.vue'
 export default {
   components: {
     VAutoCompleteWithValidation,
-    VTextAreaWithValidation
+    VTextAreaWithValidation,
+    ExpReductionAlert,
+    ValidationObserver
   },
   props: {
     editInitialValue: {
@@ -66,14 +82,14 @@ export default {
   data: () => ({
     hour: '',
     minute: '',
-    memo: ''
+    memo: '',
+    editInitHour: 0,
+    editInitMinute: 1,
+    displayAlert: false
   }),
   computed: {
     timeProcess () {
       return this.hour + ':' + this.minute
-    },
-    currentUserId () {
-      return this.$store.state.currentUser.id
     },
     hours () {
       const hours = []
@@ -87,45 +103,46 @@ export default {
     }
   },
   methods: {
-    addTimeReport () {
+    record () {
       const timeReport = {
         study_time: this.timeProcess,
         memo: this.memo
       }
-      axios
-        .post('/v1/time_reports', {
-          time_report: timeReport,
-          user_id: this.currentUserId
-        })
-        .then((res) => {
-          this.$emit('closeModal')
-          const timeReport = res.data.time_report
-          const experienceRecord = res.data.experience_record
-          const experience = res.data.experience
-          const requiredExp = res.data.required_exp
-          this.$store.commit('timeReport/setTimeReport', { timeReport })
-          this.$store.commit('experience/setExperienceRecord',
-            { experienceRecord })
-          this.$store.commit('experience/setExperience', { experience })
-          this.$store.commit('experience/setRequiredExp', { requiredExp })
-          this.$store.commit('drawing/setFlash', {
-            status: true,
-            type: 'success',
-            message: '時間を記録しました'
-          })
-          this.hour = '0'
-          this.minute = '1'
-          this.memo = ''
-          setTimeout(() => {
-            this.$store.commit('drawing/setFlash', {})
-          }, 2000)
-        })
+      // 再編集の場合
+      if (this.editInitialValue) {
+        timeReport.id = this.editInitialValue.id
+        // 経験値が減る場合は警告を出す
+        const oldExp = this.editInitHour * 60 + this.editInitMinute
+        const nexExp = Number(this.hour) * 60 + Number(this.minute)
+        if (oldExp > nexExp) {
+          this.displayAlert = true
+        } else {
+          this.$emit('record', timeReport)
+        }
+      } else {
+        this.$emit('record', timeReport)
+        this.hour = '0'
+        this.minute = '1'
+      }
     },
     closeModal () {
       this.$emit('closeModal')
+    },
+    cancel () {
+      this.displayAlert = false
+    },
+    understanding () {
+      const timeReport = {
+        study_time: this.timeProcess,
+        memo: this.memo,
+        id: this.editInitialValue.id
+      }
+      this.displayAlert = false
+      this.$emit('record', timeReport)
     }
   },
   mounted () {
+    // 再編集のときの初期値を設定
     if (this.editInitialValue) {
       const time = new Date(this.editInitialValue.study_time)
       const hour = time.getUTCHours()
@@ -133,7 +150,8 @@ export default {
       this.hour = hour.toString()
       this.minute = minute.toString()
       this.memo = this.editInitialValue.memo
-      console.log(this.minute)
+      this.editInitHour = hour
+      this.editInitMinute = minute
     } else {
       this.hour = '0'
       this.minute = '1'

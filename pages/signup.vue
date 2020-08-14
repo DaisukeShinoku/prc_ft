@@ -1,42 +1,61 @@
 <template>
-  <v-card class="mx-auto mt-5 pa-5" width="500px">
-    <v-card-title>
-      <h1 class="display-1">新規登録</h1>
-    </v-card-title>
-    <v-card-text>
-      <v-form>
-        <v-text-field v-model="name" :counter="10" label="名前" data-vv-name="name" required></v-text-field>
-        <v-text-field v-model="email" label="メールアドレス" data-vv-name="email" required></v-text-field>
-        <v-text-field v-model="screen_name" label="ユーザーID" data-vv-name="screen_name" required></v-text-field>
-        <v-text-field
+  <ValidationObserver ef="obs" v-slot="{ passes }">
+    <v-card class="mx-auto mt-5 pa-5" width="500px">
+      <v-card-title>
+        <h1 class="display-1">新規登録</h1>
+      </v-card-title>
+      <v-card-text>
+        <v-form>
+          <VTextFieldWithValidation
+          v-model="name"
+          rules="max:20|required"
+          :counter="20"
+          label="名前"
+          />
+          <VTextFieldWithValidation
+          v-model="email"
+          rules="max:255|required|email"
+          label="メールアドレス"
+          />
+          <span>必須項目ではありません。（仮）</span>
+          <VTextFieldWithValidation
+          v-model="screen_name"
+          :rules="{ min: 5, max: 15, regex: /^[a-z0-9_]+$/i }"
+          label="ユーザーID"
+          />
+          <VTextFieldWithValidation
           v-model="password"
+          rules="required|min:6"
           label="パスワード"
-          data-vv-name="password"
-          required
           :type="show1 ? 'text' : 'password'"
           :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
           @click:append="show1 = !show1"
-        ></v-text-field>
-        <v-text-field
+          vid="password"
+          />
+          <VTextFieldWithValidation
           v-model="passwordConfirm"
+          rules="required|min:6|confirmed:パスワード"
           label="パスワードの確認"
-          data-vv-name="passwordConfirm"
-          required
           :type="show2 ? 'text' : 'password'"
           :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
           @click:append="show2 = !show2"
-        ></v-text-field>
-        <v-btn class="mr-4 light-green lighten-3 mx-auto" @click="signup">登録</v-btn>
-        <p v-if="error" class="errors">{{error}}</p>
-      </v-form>
-    </v-card-text>
-  </v-card>
+          />
+          <v-btn class="mr-4 light-green lighten-3 mx-auto" @click="passes(signup)">登録</v-btn>
+          <p v-if="error" class="errors">{{error}}</p>
+        </v-form>
+      </v-card-text>
+    </v-card>
+  </ValidationObserver>
 </template>
 
 <script>
+import VTextFieldWithValidation from '~/components/molecules/inputs/VTextFieldWithValidation.vue'
 import axios from '@/plugins/axios'
 import firebase from '@/plugins/firebase'
 export default {
+  components: {
+    VTextFieldWithValidation
+  },
   data () {
     return {
       email: '',
@@ -51,9 +70,6 @@ export default {
   },
   methods: {
     signup () {
-      if (this.password !== this.passwordConfirm) {
-        this.error = '※パスワードとパスワード確認が一致していません'
-      }
       this.$store.commit('drawing/setLoading', true)
       firebase
         .auth()
@@ -67,6 +83,14 @@ export default {
           }
           axios.post('/v1/users', { user }).then((responce) => {
             this.$store.commit('drawing/setLoading', false)
+            this.$store.commit('drawing/setFlash', {
+              status: true,
+              type: 'success',
+              message: 'ログインしました'
+            })
+            setTimeout(() => {
+              this.$store.commit('drawing/setFlash', {})
+            }, 2000)
             this.$store.commit('setUser', responce.data)
             this.$router.push('/')
           })

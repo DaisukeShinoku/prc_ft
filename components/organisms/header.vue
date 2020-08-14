@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import TimeReportModal from './TimeReportModal.vue'
+import TimeReportModal from './timeReports/TimeReportModal.vue'
 import firebase from '@/plugins/firebase'
 export default {
   components: {

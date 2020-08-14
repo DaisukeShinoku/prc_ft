@@ -42,8 +42,8 @@ export default {
   mounted () {
     this.$store.subscribe((mutation, state) => {
       if (mutation.type === 'experience/setExperience') {
-        const level = mutation.payload.experience.level
-        if (level !== this.$store.state.currentUser.level) {
+        const level = mutation.payload.level
+        if (level > this.$store.state.currentUser.level) {
           this.levelUp = true
           this.level = level
           this.$store.commit('setLevel', level)
@@ -60,14 +60,17 @@ h1#level-up {
   margin-left: 140px;
   margin-right: 20px;
 }
+
 h1#current-level {
   text-align: center;
   color: #FF8F00;
   font-size: 3.4em;
 }
+
 p#level-up-message {
   margin-top: 50px;
   text-align: center;
   font-size: 1.2em;
 }
+
 </style>

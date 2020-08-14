@@ -63,6 +63,8 @@
   :index="index"
   :user="user"
   :time_report="time_report"
+  @updateTimeReport="updateExperience"
+  @deleteTimeReport="deleteTimeReport"
   />
 </div>
 </template>
@@ -71,7 +73,8 @@
 import axios from '@/plugins/axios'
 import ErrorCard from '~/components/molecules/ErrorCard.vue'
 import Heatmap from '~/components/molecules/Heatmap.vue'
-import TimeReport from '~/components/molecules/TimeReport.vue'
+import TimeReport from '~/components/organisms/timeReports/TimeReport.vue'
+
 export default {
   components: {
     ErrorCard,
@@ -104,6 +107,19 @@ export default {
       return this.requiredExp.required_exp - this.user.experience_to_next
     }
   },
+  methods: {
+    updateExperience (data) {
+      Object.assign(this.user, data.experience)
+      this.requiredExp = data.required_exp
+      this.$store.commit('experience/setExperience', data.experience)
+      this.$store.commit('setLevel', data.experience.level)
+    },
+    deleteTimeReport (timeReportId) {
+      this.timeReports = this.timeReports.filter((t) => {
+        return t.id !== timeReportId
+      })
+    }
+  },
   mounted () {
     axios
       .get(`/v1/users/${this.$route.params.id}`)
@@ -122,22 +138,24 @@ export default {
       })
     // 新しい記録を一覧に追加
     this.$store.subscribe((mutation, state) => {
-      const currentUserId = this.currentUser.id.toString()
-      if (mutation.type === 'timeReport/setTimeReport') {
-        if (currentUserId === this.$route.params.id) {
-          this.timeReports.unshift(mutation.payload.timeReport)
-        }
-      } else if (mutation.type === 'experience/setExperienceRecord') {
-        if (currentUserId === this.$route.params.id) {
-          Object.assign(this.timeReports[0], mutation.payload.experienceRecord)
-        }
-      } else if (mutation.type === 'experience/setExperience') {
-        if (currentUserId === this.$route.params.id) {
-          Object.assign(this.user, mutation.payload.experience)
-        }
-      } else if (mutation.type === 'experience/setRequiredExp') {
-        if (currentUserId === this.$route.params.id) {
-          this.requiredExp = mutation.payload.requiredExp
+      if (this.currentUser) {
+        const currentUserId = this.currentUser.id.toString()
+        if (mutation.type === 'timeReport/setTimeReport') {
+          if (currentUserId === this.$route.params.id) {
+            this.timeReports.unshift(mutation.payload)
+          }
+        } else if (mutation.type === 'experience/setExperienceRecord') {
+          if (currentUserId === this.$route.params.id) {
+            Object.assign(this.timeReports[0], mutation.payload)
+          }
+        } else if (mutation.type === 'experience/setExperience') {
+          if (currentUserId === this.$route.params.id) {
+            Object.assign(this.user, mutation.payload)
+          }
+        } else if (mutation.type === 'experience/setRequiredExp') {
+          if (currentUserId === this.$route.params.id) {
+            this.requiredExp = mutation.payload
+          }
         }
       }
     })
@@ -149,10 +167,12 @@ export default {
 h2 {
   margin-top: 12px;
 }
+
 div.user-level {
   margin: 0;
   padding: 0;
 }
+
 div.user-level h2 {
   margin: 0;
 }
