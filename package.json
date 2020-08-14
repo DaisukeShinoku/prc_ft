@@ -17,6 +17,7 @@
     "loaders.css": "^0.1.2",
     "nuxt": "^2.13.0",
     "nuxt-fontawesome": "^0.4.0",
+    "vee-validate": "^3.3.9",
     "vue-chart-heatmap": "^1.2.5",
     "vuejs-heatmap": "^1.1.7"
   },

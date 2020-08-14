@@ -4,8 +4,7 @@
   :display="userNotFound"
   title="404 not find"
   message="ユーザーが存在しません。"
-  >
-  </ErrorCard>
+  />
   <v-container v-if="!userNotFound">
     <v-card class="mx-auto mt-5 pa-5" width="1000px">
       <v-row justify="center">
@@ -65,6 +64,7 @@
 import axios from '@/plugins/axios'
 import ErrorCard from '~/components/molecules/error-card.vue'
 import Heatmap from '~/components/molecules/Heatmap.vue'
+
 export default {
   components: {
     ErrorCard,
@@ -98,10 +98,12 @@ export default {
 h2 {
   margin-top: 12px;
 }
+
 div.user-level {
   margin: 0;
   padding: 0;
 }
+
 div.user-level h2 {
   margin: 0;
 }
