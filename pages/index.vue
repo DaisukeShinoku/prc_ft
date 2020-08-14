@@ -5,12 +5,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 export default {
   components: {
   },
   computed: {
-    ...mapGetters(['currentUser'])
+    currentUser () {
+      return this.$store.state.currentUser
+    }
   }
 }
 </script>
