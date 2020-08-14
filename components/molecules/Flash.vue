@@ -1,6 +1,8 @@
 <template>
   <transition name="fade">
-    <v-alert v-if="flash.status" :type="flashType" class="flash">{{ flash.message }}</v-alert>
+    <v-alert v-if="flash.status" :type="flashType" class="flash">
+      {{ flash.message }}
+    </v-alert>
   </transition>
 </template>
 
@@ -8,7 +10,7 @@
 export default {
   computed: {
     flash () {
-      return this.$store.state.flash
+      return this.$store.state.drawing.flash
     },
     flashType () {
       let type = ''
@@ -25,7 +27,7 @@ export default {
 
 <style>
 .v-alert__wrapper {
-  display: block;
+  display: block !important;
 }
 .v-alert__icon {
   display: inline-block;
@@ -35,7 +37,7 @@ export default {
   display: inline-block;
 }
 .flash {
-  position: fixed;
+  position: fixed !important;
   width: 100%;
   z-index: 50;
   text-align: center;

@@ -108,13 +108,13 @@ export default {
         .signOut()
         .then(() => {
           this.$store.commit('setUser', null)
-          this.$store.commit('setFlash', {
+          this.$store.commit('drawing/setFlash', {
             status: true,
             type: 'success',
             message: 'ログアウトしました'
           })
           setTimeout(() => {
-            this.$store.commit('setFlash', {})
+            this.$store.commit('drawing/setFlash', {})
           }, 2000)
           this.$router.push('/login')
         })

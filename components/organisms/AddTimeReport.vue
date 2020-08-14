@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import VAutoCompleteWithValidation from '../molecules/inputs/VAutoCompleteWithValidation.vue'
+import VAutoCompleteWithValidation from '../molecules/inputs/VAutocompleteWithValidation.vue'
 import VTextAreaWithValidation from '../molecules/inputs/VTextAreaWithValidation.vue'
 import axios from '@/plugins/axios'
 export default {
@@ -58,9 +58,14 @@ export default {
     VAutoCompleteWithValidation,
     VTextAreaWithValidation
   },
+  props: {
+    editInitialValue: {
+      type: Object
+    }
+  },
   data: () => ({
-    hour: '0',
-    minute: '0',
+    hour: '',
+    minute: '',
     memo: ''
   }),
   computed: {
@@ -96,20 +101,42 @@ export default {
           this.$emit('closeModal')
           const timeReport = res.data.time_report
           const experienceRecord = res.data.experience_record
-          this.$store.commit('setTimeReport', { timeReport })
-          this.$store.commit('setExperienceRecord', { experienceRecord })
-          this.$store.commit('setFlash', {
+          const experience = res.data.experience
+          const requiredExp = res.data.required_exp
+          this.$store.commit('timeReport/setTimeReport', { timeReport })
+          this.$store.commit('experience/setExperienceRecord',
+            { experienceRecord })
+          this.$store.commit('experience/setExperience', { experience })
+          this.$store.commit('experience/setRequiredExp', { requiredExp })
+          this.$store.commit('drawing/setFlash', {
             status: true,
             type: 'success',
             message: '時間を記録しました'
           })
+          this.hour = '0'
+          this.minute = '1'
+          this.memo = ''
           setTimeout(() => {
-            this.$store.commit('setFlash', {})
+            this.$store.commit('drawing/setFlash', {})
           }, 2000)
         })
     },
     closeModal () {
       this.$emit('closeModal')
+    }
+  },
+  mounted () {
+    if (this.editInitialValue) {
+      const time = new Date(this.editInitialValue.study_time)
+      const hour = time.getUTCHours()
+      const minute = time.getUTCMinutes()
+      this.hour = hour.toString()
+      this.minute = minute.toString()
+      this.memo = this.editInitialValue.memo
+      console.log(this.minute)
+    } else {
+      this.hour = '0'
+      this.minute = '1'
     }
   }
 }

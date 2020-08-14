@@ -8,15 +8,8 @@ export const state = () => ({
     id: '',
     name: '',
     email: '',
-    screen_name: ''
-  },
-  timeReport: {},
-  experienceRecord: {},
-  loading: false,
-  flash: {
-    status: false,
-    type: '',
-    message: ''
+    screen_name: '',
+    level: 1
   }
 })
 
@@ -24,18 +17,7 @@ export const mutations = {
   setUser (state, payload) {
     state.currentUser = payload
   },
-  setLoading (state, payload) {
-    state.loading = payload
-  },
-  setFlash (state, payload) {
-    state.flash = payload
-  },
-  setTimeReport (state, payload) {
-    state.timeReport = payload
-    state.timeReport = {}
-  },
-  setExperienceRecord (state, payload) {
-    state.setExperienceRecord = payload
-    state.setExperienceRecord = {}
+  setLevel (state, payload) {
+    state.currentUser.level = payload
   }
 }

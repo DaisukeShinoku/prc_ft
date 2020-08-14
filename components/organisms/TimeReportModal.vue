@@ -1,19 +1,24 @@
 <template>
-  <v-row justify="center">
-    <v-dialog v-model="dialog" persistent max-width="600px">
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn
-          color="primary"
-          dark
-          v-bind="attrs"
-          v-on="on"
-        >
-          時間を記録する
-        </v-btn>
-      </template>
-      <AddTimeReport @closeModal="closeModal" />
+  <div>
+    <v-btn
+      color="primary"
+      dark
+      @click.stop="dialog = true"
+      v-if="btnDisplay"
+    >
+      時間を記録する
+    </v-btn>
+    <v-dialog
+    v-model="dialog"
+    persistent
+    max-width="600px"
+    >
+      <AddTimeReport
+      @closeModal="closeModal"
+      :editInitialValue="editInitialValue"
+      />
     </v-dialog>
-  </v-row>
+  </div>
 </template>
 
 <script>
@@ -22,12 +27,23 @@ export default {
   components: {
     AddTimeReport
   },
-  data: () => ({
-    dialog: false
-  }),
+  props: {
+    btnDisplay: {
+      type: Boolean,
+      default: true
+    },
+    dialog: {
+      type: Boolean,
+      default: false
+    },
+    editInitialValue: {
+      type: Object
+    }
+  },
   methods: {
     closeModal () {
       this.dialog = false
+      this.$emit('closeModal')
     }
   }
 }

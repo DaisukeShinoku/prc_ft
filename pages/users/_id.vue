@@ -10,7 +10,7 @@
       <v-row justify="center">
         <v-col cols="2" style="color: #FFD54F;">
           <v-row justify="center" style="margin-top: 48px;">
-            <h1>Lv.1</h1>
+            <h1>Lv.{{ user.level }}</h1>
           </v-row>
           <v-row justify="center">
             <span>current Level</span>
@@ -31,7 +31,7 @@
         </v-col>
         <v-col cols="2" style="color: #FFD54F;">
           <v-row justify="center" style="margin-top: 48px;">
-            <h1>60</h1>
+            <h1>{{ user.total_experience }}</h1>
           </v-row>
           <v-row justify="center">
             <span>Total EXP</span>
@@ -45,15 +45,15 @@
         <v-col cols="1">
         </v-col>
         <v-col cols="7">
-          <v-progress-linear height="10px" value="24">
+          <v-progress-linear height="10px" :value="progressProportion">
           </v-progress-linear>
         </v-col>
         <v-col cols="1" style="padding-top: 6px; color: #B0BEC5;">
-          60/250
+          {{ progressNumeretor }}/{{ requiredExp.required_exp }}
         </v-col>
       </v-row>
       <v-row justify="center">
-        <Heatmap></Heatmap>
+        <Heatmap :timeReports="timeReports" />
       </v-row>
     </v-card>
   </v-container>
@@ -72,7 +72,6 @@ import axios from '@/plugins/axios'
 import ErrorCard from '~/components/molecules/ErrorCard.vue'
 import Heatmap from '~/components/molecules/Heatmap.vue'
 import TimeReport from '~/components/molecules/TimeReport.vue'
-
 export default {
   components: {
     ErrorCard,
@@ -83,6 +82,7 @@ export default {
     return {
       user: {},
       timeReports: [],
+      requiredExp: {},
       userNotFound: false,
       errorTitle: '',
       errorMessage: ''
@@ -91,6 +91,17 @@ export default {
   computed: {
     currentUser () {
       return this.$store.state.currentUser
+    },
+    progressProportion () {
+      const proportion = 100 - this.user.experience_to_next / this.requiredExp.required_exp * 100
+      if (proportion === 100) {
+        return 0
+      } else {
+        return proportion
+      }
+    },
+    progressNumeretor () {
+      return this.requiredExp.required_exp - this.user.experience_to_next
     }
   },
   mounted () {
@@ -99,6 +110,7 @@ export default {
       .then((response) => {
         this.user = response.data.user
         this.timeReports = response.data.time_reports
+        this.requiredExp = response.data.required_exp
       })
       .catch((error) => {
         if (error.response.status === 404) {
@@ -110,15 +122,22 @@ export default {
       })
     // 新しい記録を一覧に追加
     this.$store.subscribe((mutation, state) => {
-      if (mutation.type === 'setTimeReport') {
-        const timeReportUserId = mutation.payload.timeReport.user_id.toString()
-        if (timeReportUserId === this.$route.params.id) {
+      const currentUserId = this.currentUser.id.toString()
+      if (mutation.type === 'timeReport/setTimeReport') {
+        if (currentUserId === this.$route.params.id) {
           this.timeReports.unshift(mutation.payload.timeReport)
         }
-      } else if (mutation.type === 'setExperienceRecord') {
-        const experienceRecordUserId = mutation.payload.experienceRecord.user_id.toString()
-        if (experienceRecordUserId === this.$route.params.id) {
+      } else if (mutation.type === 'experience/setExperienceRecord') {
+        if (currentUserId === this.$route.params.id) {
           Object.assign(this.timeReports[0], mutation.payload.experienceRecord)
+        }
+      } else if (mutation.type === 'experience/setExperience') {
+        if (currentUserId === this.$route.params.id) {
+          Object.assign(this.user, mutation.payload.experience)
+        }
+      } else if (mutation.type === 'experience/setRequiredExp') {
+        if (currentUserId === this.$route.params.id) {
+          this.requiredExp = mutation.payload.requiredExp
         }
       }
     })
@@ -130,12 +149,10 @@ export default {
 h2 {
   margin-top: 12px;
 }
-
 div.user-level {
   margin: 0;
   padding: 0;
 }
-
 div.user-level h2 {
   margin: 0;
 }
