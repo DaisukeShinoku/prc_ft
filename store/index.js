@@ -10,6 +10,8 @@ export const state = () => ({
     email: '',
     screen_name: ''
   },
+  timeReport: {},
+  experienceRecord: {},
   loading: false,
   flash: {
     status: false,
@@ -27,5 +29,13 @@ export const mutations = {
   },
   setFlash (state, payload) {
     state.flash = payload
+  },
+  setTimeReport (state, payload) {
+    state.timeReport = payload
+    state.timeReport = {}
+  },
+  setExperienceRecord (state, payload) {
+    state.setExperienceRecord = payload
+    state.setExperienceRecord = {}
   }
 }

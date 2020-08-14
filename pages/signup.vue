@@ -73,6 +73,7 @@ export default {
         })
         .catch((error) => {
           this.error = ((code) => {
+            this.$store.commit('setLoading', false)
             switch (code) {
               case 'auth/email-already-in-use':
                 return '既にそのメールアドレスは使われています'

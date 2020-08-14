@@ -57,6 +57,13 @@
       </v-row>
     </v-card>
   </v-container>
+  <TimeReport
+  v-for="(time_report, index) in timeReports"
+  :key="time_report.id"
+  :index="index"
+  :user="user"
+  :time_report="time_report"
+  />
 </div>
 </template>
 
@@ -64,23 +71,35 @@
 import axios from '@/plugins/axios'
 import ErrorCard from '~/components/molecules/ErrorCard.vue'
 import Heatmap from '~/components/molecules/Heatmap.vue'
+import TimeReport from '~/components/molecules/TimeReport.vue'
+
 export default {
   components: {
     ErrorCard,
-    Heatmap
+    Heatmap,
+    TimeReport
   },
   data () {
     return {
       user: {},
+      timeReports: [],
       userNotFound: false,
-      errorTitle: 'エラー',
-      errorMessage: 'エラーが発生しました。'
+      errorTitle: '',
+      errorMessage: ''
+    }
+  },
+  computed: {
+    currentUser () {
+      return this.$store.state.currentUser
     }
   },
   mounted () {
     axios
       .get(`/v1/users/${this.$route.params.id}`)
-      .then((response) => { this.user = response.data })
+      .then((response) => {
+        this.user = response.data.user
+        this.timeReports = response.data.time_reports
+      })
       .catch((error) => {
         if (error.response.status === 404) {
           this.userNotFound = true
@@ -89,6 +108,20 @@ export default {
         }
         console.error(error)
       })
+    // 新しい記録を一覧に追加
+    this.$store.subscribe((mutation, state) => {
+      if (mutation.type === 'setTimeReport') {
+        const timeReportUserId = mutation.payload.timeReport.user_id.toString()
+        if (timeReportUserId === this.$route.params.id) {
+          this.timeReports.unshift(mutation.payload.timeReport)
+        }
+      } else if (mutation.type === 'setExperienceRecord') {
+        const experienceRecordUserId = mutation.payload.experienceRecord.user_id.toString()
+        if (experienceRecordUserId === this.$route.params.id) {
+          Object.assign(this.timeReports[0], mutation.payload.experienceRecord)
+        }
+      }
+    })
   }
 }
 </script>
@@ -97,10 +130,12 @@ export default {
 h2 {
   margin-top: 12px;
 }
+
 div.user-level {
   margin: 0;
   padding: 0;
 }
+
 div.user-level h2 {
   margin: 0;
 }
