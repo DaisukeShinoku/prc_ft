@@ -1,13 +1,14 @@
 <template>
   <v-app style="background-color: #F1F8E9">
-    <Loading></Loading>
-    <Header></Header>
+    <FlashSuccess />
+    <Loading />
+    <Header />
     <v-content>
       <v-container>
         <nuxt />
       </v-container>
     </v-content>
-    <Footer></Footer>
+    <Footer />
   </v-app>
 </template>
 
@@ -15,12 +16,14 @@
 import Header from '~/components/organisms/header.vue'
 import Footer from '~/components/organisms/footer.vue'
 import Loading from '~/components/molecules/loading.vue'
+import FlashSuccess from '~/components/molecules/flash-success.vue'
 
 export default {
   components: {
     Header,
     Footer,
-    Loading
+    Loading,
+    FlashSuccess
   },
   data () {
     return {

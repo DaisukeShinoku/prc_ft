@@ -3,13 +3,34 @@
     :clipped-left="clipped"
     fixed
     app
+    style="background-color: #64DD17"
   >
     <v-toolbar-title>
-      <h2 class="app-title">
-        PolPa
-      </h2>
+      <n-link to="/" style="color:white; text-decoration:none;">
+        <h2 class="app-title">
+          PolPa
+        </h2>
+      </n-link>
     </v-toolbar-title>
     <v-spacer />
+    <v-btn
+    v-if="!currentUser"
+    to="/login"
+    style="margin-right: 20px"
+    text
+    color="white"
+    :outlined="true"
+    >
+    <h4>ログイン</h4>
+  </v-btn>
+  <v-btn
+  v-if="!currentUser"
+  color="primary"
+  to="/signup"
+  style="margin-right: 200px"
+  >
+    新規登録
+  </v-btn>
     <v-menu
     v-model="value"
     :offset-y="true"
@@ -82,6 +103,14 @@ export default {
         .signOut()
         .then(() => {
           this.$store.commit('setUser', null)
+          this.$store.commit('setFlash', {
+            status: true,
+            type: 'success',
+            message: 'ログアウトしました'
+          })
+          setTimeout(() => {
+            this.$store.commit('setFlash', {})
+          }, 2000)
           this.$router.push('/login')
         })
         .catch((error) => {
