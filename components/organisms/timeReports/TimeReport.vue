@@ -39,6 +39,9 @@
       />
       </v-card-title>
       <v-card-text style="margin-top: 10px">
+        <v-row style="margin-left: 20px; margin-bottom: 10px;">
+          <Tag v-for="tag in timeReport.tags" :tag="tag.name" :key="tag.id" />
+        </v-row>
         <v-row>
           <v-col>
             <v-icon small style="margin-left: 20px; margin-right: 10px">
@@ -64,6 +67,7 @@
 </template>
 
 <script>
+import Tag from '../../molecules/Tag.vue'
 import IconButtonWithAuth from '../../atoms/icons/IconButtonWithAuth.vue'
 import ExpReductionAlert from '../ExpReductionAlert.vue'
 import TimeReportModal from './TimeReportModal.vue'
@@ -73,7 +77,8 @@ export default {
   components: {
     ExpReductionAlert,
     TimeReportModal,
-    IconButtonWithAuth
+    IconButtonWithAuth,
+    Tag
   },
   props: {
     index: {
@@ -137,6 +142,7 @@ export default {
     updateTimeReport (data) {
       this.timeReport = data.time_report
       this.timeReport.experience_point = data.experience_record.experience_point
+      this.timeReport.tags = data.tags
       this.$emit('updateTimeReport', data)
     },
     deleteTimeReport () {
@@ -150,7 +156,6 @@ export default {
         .then((res) => {
           this.$emit('updateTimeReport', res.data)
           this.$emit('deleteTimeReport', timeReportId)
-          console.log(res.data)
           this.$store.commit('drawing/setFlash', {
             status: true,
             type: 'success',

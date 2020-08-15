@@ -1,3 +1,4 @@
+  
 <template>
   <TimeReportForm
   @record="addTimeReport"
@@ -19,11 +20,12 @@ export default {
     }
   },
   methods: {
-    addTimeReport (timeReport) {
+    addTimeReport (data) {
       axios
         .post('/v1/time_reports', {
-          time_report: timeReport,
-          user_id: this.currentUser.id
+          time_report: data.timeReport,
+          user_id: this.currentUser.id,
+          tags: data.tags
         })
         .then((res) => {
           this.$emit('closeModal')
@@ -31,7 +33,9 @@ export default {
           const experienceRecord = res.data.experience_record
           const experience = res.data.experience
           const requiredExp = res.data.required_exp
+          const tags = res.data.tags
           this.$store.commit('timeReport/setTimeReport', timeReport)
+          this.$store.commit('timeReport/setTags', tags)
           this.$store.commit('experience/setExperienceRecord', experienceRecord)
           this.$store.commit('experience/setExperience', experience)
           this.$store.commit('experience/setRequiredExp', requiredExp)

@@ -9,5 +9,8 @@
 
 <script>
 export default {
+  data: () => ({
+    fixed: false
+  })
 }
 </script>

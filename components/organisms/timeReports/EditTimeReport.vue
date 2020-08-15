@@ -26,11 +26,12 @@ export default {
     }
   },
   methods: {
-    editTimeReport (timeReport) {
+    editTimeReport (data) {
       axios
-        .patch(`/v1/time_reports/${timeReport.id}`, {
-          time_report: timeReport,
-          user_id: this.currentUser.id
+        .patch(`/v1/time_reports/${data.timeReport.id}`, {
+          time_report: data.timeReport,
+          user_id: this.currentUser.id,
+          tags: data.tags
         })
         .then((res) => {
           this.$emit('closeModal')
