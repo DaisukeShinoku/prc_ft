@@ -3,6 +3,7 @@
       v-model="dialog"
       max-width="500"
       transition="scroll-y-transition"
+      persistent
     >
       <v-card>
         <v-card-title style="color: #FFD54F;">

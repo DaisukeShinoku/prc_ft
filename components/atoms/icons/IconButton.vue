@@ -3,6 +3,7 @@
   icon
   v-bind="$attrs"
   v-on="$listeners"
+  @click="click"
   >
     <v-icon v-bind="$attrs">
       {{ type }}
@@ -16,6 +17,11 @@ export default {
     type: {
       type: String,
       required: true
+    }
+  },
+  methods: {
+    click () {
+      this.$emit('on')
     }
   }
 }

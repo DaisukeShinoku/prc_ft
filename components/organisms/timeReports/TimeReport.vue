@@ -12,6 +12,7 @@
       <v-spacer />
       <IconButtonWithAuth
       type="far fa-edit"
+      v-if="authDisplay"
       :comparison="timeReport.user_id"
       @click.stop="modalDisplay = true"
       small
@@ -26,6 +27,7 @@
       />
       <IconButtonWithAuth
       type="far fa-trash-alt"
+      v-if="authDisplay"
       :comparison="timeReport.user_id"
       style="margin-right: 10px;"
       @click="displayAlert = true"
@@ -39,28 +41,51 @@
       />
       </v-card-title>
       <v-card-text style="margin-top: 10px">
-        <v-row style="margin-left: 20px; margin-bottom: 10px;">
-          <Tag v-for="tag in timeReport.tags" :tag="tag.name" :key="tag.id" />
+        <nuxt-link :to="toLink" style="color: inherit; text-decoration: none;">
+          <v-row style="margin-left: 20px; margin-bottom: 10px;">
+            <Tag v-for="tag in timeReport.tags" :tag="tag.name" :key="tag.id" />
+          </v-row>
+          <v-row>
+            <v-col>
+              <v-icon small style="margin-left: 20px; margin-right: 10px">
+                far fa-clock
+              </v-icon>
+              <h1 :class="changeColor">{{ studyHour }}</h1>
+              <span>時間</span>
+              <h1 :class="changeColor">{{ studyMinute }}</h1>
+              <span>分</span>
+            </v-col>
+            <v-col>
+              <v-icon small style="margin-right: 10px">fas fa-pencil-alt</v-icon>
+              <h1 :class="changeColor" v-if="timeReport.experience_record">
+                {{ timeReport.experience_record.experience_point }}
+              </h1>
+              <h3 style="display: inline-block">EXP</h3>
+            </v-col>
+          </v-row>
+          <p>
+            {{ timeReport.memo }}
+          </p>
+        </nuxt-link>
+        <v-row style="margin-top: 10px; margin-left: 5px;">
+          <IconButton
+          type="far fa-comment-dots"
+          @on="commentForm = !commentForm"
+          />
         </v-row>
-        <v-row>
-          <v-col>
-            <v-icon small style="margin-left: 20px; margin-right: 10px">
-              far fa-clock
-            </v-icon>
-            <h1 :class="changeColor">{{ studyHour }}</h1>
-            <span>時間</span>
-            <h1 :class="changeColor">{{ studyMinute }}</h1>
-            <span>分</span>
-          </v-col>
-          <v-col>
-            <v-icon small style="margin-right: 10px">fas fa-pencil-alt</v-icon>
-            <h1 :class="changeColor">{{ timeReport.experience_point }}</h1>
-            <h3 style="display: inline-block">EXP</h3>
-          </v-col>
-        </v-row>
-        <p>
-          {{ timeReport.memo }}
-        </p>
+        <CommentForm
+        v-if="commentForm && currentUser"
+        :timeReportId="timeReport.id"
+        @addComment="addComment"
+        />
+        <template v-if="commentForm">
+          <Comment
+          v-for="comment in timeReport.comments"
+          :key="comment.id"
+          :comment="comment"
+          @deleteComment="deleteComment"
+          />
+        </template>
       </v-card-text>
     </v-card>
   </v-container>
@@ -68,23 +93,24 @@
 
 <script>
 import Tag from '../../molecules/Tag.vue'
+import IconButton from '../../atoms/icons/IconButton.vue'
 import IconButtonWithAuth from '../../atoms/icons/IconButtonWithAuth.vue'
+import CommentForm from '../../molecules/CommentForm.vue'
+import Comment from '../Comment.vue'
 import ExpReductionAlert from '../ExpReductionAlert.vue'
 import TimeReportModal from './TimeReportModal.vue'
 import axios from '@/plugins/axios'
-
 export default {
   components: {
     ExpReductionAlert,
     TimeReportModal,
     IconButtonWithAuth,
-    Tag
+    Tag,
+    IconButton,
+    CommentForm,
+    Comment
   },
   props: {
-    index: {
-      type: Number,
-      required: true
-    },
     time_report: {
       type: Object,
       required: true
@@ -97,8 +123,9 @@ export default {
   data () {
     return {
       modalDisplay: false,
-      timeReport: this.time_report,
-      displayAlert: false
+      timeReport: { ...this.time_report, comments: [] },
+      displayAlert: false,
+      commentForm: false
     }
   },
   computed: {
@@ -133,6 +160,17 @@ export default {
       } else {
         return 'amber--text text--lighten-2'
       }
+    },
+    toLink () {
+      return `/time_reports/${this.timeReport.id}`
+    }
+  },
+  watch: {
+    time_report (newValue) {
+      this.timeReport = newValue
+    },
+    timeReport (newValue) {
+      this.timeReport = newValue
     }
   },
   methods: {
@@ -140,9 +178,11 @@ export default {
       this.modalDisplay = false
     },
     updateTimeReport (data) {
+      const comments = this.timeReport.comments
       this.timeReport = data.time_report
-      this.timeReport.experience_point = data.experience_record.experience_point
+      this.timeReport.experience_record = data.experience_record
       this.timeReport.tags = data.tags
+      this.timeReport.comments = comments
       this.$emit('updateTimeReport', data)
     },
     deleteTimeReport () {
@@ -172,6 +212,18 @@ export default {
     understanding () {
       this.displayAlert = false
       this.deleteTimeReport()
+    },
+    addComment (comment) {
+      this.commentForm = false
+      if (!this.timeReport.comments) {
+        this.timeReport.comments = []
+      }
+      this.timeReport.comments.unshift(comment)
+    },
+    deleteComment (commentId) {
+      this.timeReport.comments = this.timeReport.comments.filter((t) => {
+        return t.id !== commentId
+      })
     }
   }
 }

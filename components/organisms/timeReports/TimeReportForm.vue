@@ -93,8 +93,6 @@ export default {
     hour: '',
     minute: '',
     memo: '',
-    editInitHour: 0,
-    editInitMinute: 1,
     displayAlert: false,
     tag: '',
     tags: []
@@ -134,7 +132,7 @@ export default {
       if (this.editInitialValue) {
         timeReport.id = this.editInitialValue.id
         // 経験値が減る場合は警告を出す
-        const oldExp = this.editInitHour * 60 + this.editInitMinute
+        const oldExp = this.editInitialValue.experience_record.experience_point
         const nexExp = Number(this.hour) * 60 + Number(this.minute)
         if (oldExp > nexExp) {
           this.displayAlert = true
@@ -145,6 +143,8 @@ export default {
         this.$emit('record', { timeReport, tags })
         this.hour = '0'
         this.minute = '1'
+        this.memo = ''
+        this.tags = []
       }
     },
     closeModal () {
@@ -176,8 +176,6 @@ export default {
       this.minute = minute.toString()
       this.memo = this.editInitialValue.memo
       this.tags = this.tagsProcessing
-      this.editInitHour = hour
-      this.editInitMinute = minute
     } else {
       this.hour = '0'
       this.minute = '1'

@@ -3,6 +3,7 @@
   icon
   v-bind="$attrs"
   v-on="$listeners"
+  v-if="authDisplay"
   >
     <v-icon v-if="authDisplay" v-bind="$attrs">
       {{ type }}

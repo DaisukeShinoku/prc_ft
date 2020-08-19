@@ -69,7 +69,7 @@
         </v-list-item>
       </v-list>
     </v-menu>
-    <TimeReportModal style="margin-right: 200px" />
+    <TimeReportModal v-if="currentUser" style="margin-right: 200px" />
   </v-app-bar>
 </template>
 
@@ -131,5 +131,8 @@ h2.app-title {
   margin-left: 200px;
   font-size: 1.5em;
   letter-spacing: 2px;
+}
+.v-avatar {
+  margin-right: 20px;
 }
 </style>

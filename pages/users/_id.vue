@@ -58,9 +58,8 @@
     </v-card>
   </v-container>
   <TimeReport
-  v-for="(time_report, index) in timeReports"
+  v-for="time_report in timeReports"
   :key="time_report.id"
-  :index="index"
   :user="user"
   :time_report="time_report"
   @updateTimeReport="updateExperience"
@@ -86,9 +85,7 @@ export default {
       user: {},
       timeReports: [],
       requiredExp: {},
-      userNotFound: false,
-      errorTitle: '',
-      errorMessage: ''
+      userNotFound: false
     }
   },
   computed: {
@@ -138,15 +135,16 @@ export default {
     axios
       .get(`/v1/users/${this.$route.params.id}`)
       .then((response) => {
-        this.user = response.data.user
-        this.timeReports = response.data.time_reports
+        const data = JSON.parse(response.data.user)
+        const timeReports = data.time_reports
+        const { time_reports, ...user } = data // eslint-disable-line
+        this.user = user
+        this.timeReports = timeReports
         this.requiredExp = response.data.required_exp
       })
       .catch((error) => {
         if (error.response.status === 404) {
           this.userNotFound = true
-          this.errorTitle = '404 not find'
-          this.errorMessage = 'ユーザーが存在しません。'
         }
         console.error(error)
       })

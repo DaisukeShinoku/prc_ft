@@ -1,4 +1,3 @@
-  
 <template>
   <TimeReportForm
   @record="addTimeReport"
@@ -10,6 +9,7 @@
 <script>
 import TimeReportForm from './TimeReportForm.vue'
 import axios from '@/plugins/axios'
+
 export default {
   components: {
     TimeReportForm
@@ -30,13 +30,14 @@ export default {
         .then((res) => {
           this.$emit('closeModal')
           const timeReport = res.data.time_report
-          const experienceRecord = res.data.experience_record
+          const experience_record = res.data.experience_record // eslint-disable-line
           const experience = res.data.experience
           const requiredExp = res.data.required_exp
           const tags = res.data.tags
           this.$store.commit('timeReport/setTimeReport', timeReport)
           this.$store.commit('timeReport/setTags', tags)
-          this.$store.commit('experience/setExperienceRecord', experienceRecord)
+          this.$store.commit('experience/setExperienceRecord',
+            { experience_record })
           this.$store.commit('experience/setExperience', experience)
           this.$store.commit('experience/setRequiredExp', requiredExp)
           this.$store.commit('drawing/setFlash', {
